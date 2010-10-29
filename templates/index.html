@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+{% block title %} Badlands Crossfit{% endblock %}
+
+{% block content %}
+
+<h2>Classes This Week</h2> 
+
+{% if scheduled_events %}
+   
+    {% regroup scheduled_events by start|date:"l" as classes %}
+   <ul>
+   {% for class in classes %}
+       <li> <h3>{{class.grouper}}</h3>
+	    {% for item in class.list %}
+        <div class="main_entry">
+			<a href="/crossfit/class/{{ item.id }}/">{{ item.class_desc.name }}</a> 
+			<p>
+			<b>Description:</b> {{item.class_desc.description}}
+			</p>
+
+			<p>
+			<b>Coach:</b> {{item.class_desc.coach.first_name}}
+			</p>
+			<p>
+			<b>Starts at {{item.start|date:"P"}}</b>
+			</p>
+     </div>
+	 {% endfor %}
+    </li>
+{% endfor %}
+   </ul>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,43 @@
+
+{% extends "user_base.html" %}
+{% load workout_extras %}
+
+{% block content %}
+
+<h2>Coach's Comments</h2> 
+
+{% if comments.object_list %}
+   
+
+    {% for comment in comments.object_list %}
+        <div class="entry">
+			{{comment.coach.first_name}} says:
+			<p>
+			{{comment.comment}}
+			</p>
+			<p>Created on: {{comment.creation_date}}</p>
+			
+	</div>
+	
+    {% endfor %}
+    
+
+{% endif %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if comments.has_previous %}
+            <a href="?page={{ comments.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
+        </span>
+
+        {% if workouts.has_next %}
+            <a href="?page={{ comments.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}

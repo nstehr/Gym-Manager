@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block js %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+      google.load("jquery", "1.4.2");
+      google.load("jqueryui", "1.8.2");
+      google.setOnLoadCallback(function(){
+		$("#id_date").datepicker()
+})
+</script>
+{% endblock %}
+{% block title %}Enter Workout Summary{% endblock %}
+
+{% block content %}
+<form action="/crossfit/result/create/" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

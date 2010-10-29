@@ -1,0 +1,68 @@
+{% load workout_extras %}
+
+<html>
+<head>
+	{% block imports %}{% endblock %}
+	<link rel="stylesheet" href="{{MEDIA_URL}}/crossfit/css/layout.css" type="text/css" media="screen" />
+	<title>{% block title %}Badlands Crossfit{% endblock %}</title>
+	{% block js %}{% endblock %}
+</head>
+	
+<body>
+	{% if not user.is_authenticated %}
+	
+	<form action="/crossfit/login/" method="post">{% csrf_token %}
+		Username: <input type="text" name="username" /> 
+		Password: <input type="password" name="password" /> 
+		<input type="submit" value="Login" /> 
+		<a href="/crossfit/register/"> Register Now </a>
+		<a href="{% url password_reset %}">Forgot password?</a>
+	</form>
+	{% endif %}
+	
+	
+<div id="container">
+	
+	<img src="{{MEDIA_URL}}/crossfit/images/badlands_crossfit.jpg" alt="logo" class="logo"/>
+	<div id = "header">
+	<h1>
+	Badlands Crossfit
+	</h1>
+	<span id='tagline'>Badlands scheduler and daily WOD journal</span>
+	
+	</div>
+
+<div id="navigation">
+<ul>
+	<li>	<a href="/crossfit">Home</a> </li>
+	<li><a href="http://badlandsunderground.blogspot.com/">Badlands Blog</a></li>
+	 {%if user|in_group:"coach"%}
+	<li><a href="/crossfit/schedule">Manage Class Schedule</a> </li>
+	<li><a href="/crossfit/users">View Athlete Progress</a> </li>
+	{% else %}
+	<li>	<a href="/crossfit/schedule">Class Schedule</a> </li>
+	{% endif %}
+{% if user.is_authenticated %}
+<li><a href="/crossfit/profile">My Profile</a> </le>
+<li><a href="/crossfit/logout/">Logout</a> </p></li>	
+{% endif %}
+
+<ul>
+</div>
+
+{% block floatright %}
+{% endblock %}
+
+<div id="content">
+{% block content %}
+{% endblock %}
+</div>
+
+
+
+<div id="footer">
+	Copyright © laserdeathstehr, 2010
+</div>
+</body>
+</div>
+</html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}User Registration{% endblock %}
+
+{% block content %}
+<form action="/crossfit/register/" method="post">{% csrf_token %}
+{{ form.as_p }}
+{% if no_waiver %}
+<b> You must agree to below conditions before continuing</b>
+{% endif %}
+<p>
+I understand that there is a risk participating in physical activities and while training with Badlands CrossFit I will not hold the trainers or other participants responsible for any injury that may occur.  
+I understand that it is my responsibility to check with my doctor before engaging in any physical activity. 
+I understand it is my responsibility to report any medical condition, or injury before participating in any classes offered by Badlands CrossFit.
+</p>
+<input type=checkbox name="waiver">I agree
+<p>
+<input type="submit" value="Submit" />
+</p>
+</form>
+{% endblock %}

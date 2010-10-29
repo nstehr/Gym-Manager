@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>
+{{class.class_desc.name}}
+</title>
+<style type="text/css">
+
+	@page {
+		size: {{pagesize}};
+		margin: 1cm;
+		@frame footer {
+    		-pdf-frame-content: footerContent;
+    		bottom: 1cm;
+    		margin-left: 1cm;
+    		margin-right: 1cm;
+    		height: 1cm;
+		}
+	}
+	
+</style>
+</head>
+<body>
+<div>
+	<h1>{{class.class_desc.name}}</h1>
+<table>
+	<th align="left">Name</th>
+	<th align="left">Phone</th>
+	<th align="left">Email</th>
+	 {% for student in class.students.all %} 
+	<tr>
+		<td>{{student.first_name}} {{student.last_name}}</td>
+		<td>{{student.profile.phone}}</td>
+		<td>{{student.email}}</td>
+	</tr> 
+	{% endfor %}
+</table>
+</div>
+<div id="footerContent">
+{%block page_foot%}
+		<pdf:pagenumber>
+{%endblock%}
+</div>
+</body>
+</html>

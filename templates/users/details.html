@@ -1,0 +1,48 @@
+{% extends "user_base.html" %}
+
+{% load workout_extras %}
+
+{% block title %}{{profile.user.first_name}}'s Contact Info{% endblock %}
+
+
+{% block content %}
+<p>
+{{profile.user.first_name}} {{profile.user.last_name}}
+</p>
+<p>
+{% if profile.phone %}
+Phone number: {{profile.phone}}
+{% endif %}
+</p>
+<p>
+{% if profile.user.email %}
+
+{%if user|in_group:"coach"%}
+Email: <a href="mailto:{{ profile.user.email }}">{{ profile.user.email }} </a>
+{% else %}
+Email: {{ profile.user.email }}
+{% endif %}
+{% endif %}
+</p>
+<p>
+Emergency Contact: {{profile.emergency_contact_name}}
+</p>
+<p>
+Emergency Contact Number: {{profile.emergency_contact_phone}}
+</p>
+{% if profile.injuries %}
+<p>
+Injuries: {{profile.injuries}}
+</p>
+{% endif %}
+{% if profile.medical_history %}
+<p>
+Medical History: {{profile.medical_history}}
+</p>
+{% endif %}
+<p>
+{% if profile.user == user %}
+<a href="/crossfit/profile/update">Edit Details</a>
+{% endif %}
+</p>
+{% endblock %}

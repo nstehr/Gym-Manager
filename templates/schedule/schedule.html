@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load workout_extras %}
+
+{% block imports %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7/themes/redmond/jquery-ui.css" rel="stylesheet" />
+<link rel='stylesheet' type='text/css' href='{{MEDIA_URL}}/crossfit/fullcalendar/fullcalendar.css' />
+<script type='text/javascript' src='{{MEDIA_URL}}/crossfit/fullcalendar/jquery/jquery.js'></script>
+<script type='text/javascript' src='{{MEDIA_URL}}/crossfit/fullcalendar/jquery/jquery-ui-custom.js'></script>
+<script type='text/javascript' src='{{MEDIA_URL}}/crossfit/fullcalendar/fullcalendar.min.js'></script>
+{% endblock %}
+
+{% block js %}
+
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+
+		/* initialize the external events
+				-----------------------------------------------------------------*/
+
+				$('#external-events div.external-event').each(function() {
+
+					// create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+					// it doesn't need to have a start or end
+					var eventObject = {
+						title: $.trim($(this).text()) // use the element's text as the event title
+					};
+
+					// store the Event Object in the DOM element so we can get to it later
+					$(this).data('eventObject', eventObject);
+
+					// make the event draggable using jQuery UI
+					$(this).draggable({
+						zIndex: 999,
+						revert: true,      // will cause the event to go back to its
+						revertDuration: 0  //  original position after the drag
+					});
+
+				});
+
+			$('#calendar').fullCalendar({
+				theme: true,
+				firstDay: 0,
+				minTime:'6am',
+				maxTime:'10pm',
+				header: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay'
+				},
+				{% if user|in_group:"coach" %}
+				editable: true,
+				droppable: true,
+				{% else %}
+				editable: false,
+				droppable: false,
+				{% endif %}
+				drop: function(date, allDay) { // this function is called when something is dropped
+
+							// retrieve the dropped element's stored Event Object
+							var originalEventObject = $(this).data('eventObject');
+
+							// we need to copy it, so that multiple events don't have a reference to the same object
+							var copiedEventObject = $.extend({}, originalEventObject);
+
+							// assign it the date that was reported
+							copiedEventObject.start = date;
+							copiedEventObject.allDay = allDay;
+							//create an event in the DB
+							var my_date = $.fullCalendar.formatDate( date,"yyyy-MM-dd HH:mm:ss")
+							var eventData = { name:copiedEventObject.title,startTime:my_date};
+							
+							$.post("/crossfit/class/create/", eventData );
+							
+							// render the event on the calendar
+							//want to make sure the end was in the backend, so refetch the events
+							$('#calendar').fullCalendar( 'refetchEvents' )
+						},
+				eventResize: function(event, jsEvent, ui, view) { 
+				    var eventData = {id:event.id,startDate:$.fullCalendar.formatDate( event.start,"yyyy-MM-dd HH:mm:ss"),endDate:$.fullCalendar.formatDate(event.end,"yyyy-MM-dd HH:mm:ss")}
+					$.post("/crossfit/class/modify/", eventData );
+				},
+				eventDrop:function( event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view ) {
+					var eventData = {id:event.id,startDate:$.fullCalendar.formatDate( event.start,"yyyy-MM-dd HH:mm:ss"),endDate:$.fullCalendar.formatDate(event.end,"yyyy-MM-dd HH:mm:ss")}
+					$.post("/crossfit/class/modify/", eventData );
+					 },
+				{% if username %}
+				events: "/crossfit/schedule/feed/{{username}}"
+				{% else %}
+				events: "/crossfit/schedule/feed"
+				{% endif %}
+			});
+
+		});
+	
+</script>
+{% endblock %}
+{% block title %}
+{% if username and user|in_group:"coach"%}
+Classes I'm Coaching
+{% else %}{% if username and user|in_group:"athlete"%}
+My Classes
+{% else %}
+Workout Schedule
+{% endif %}{% endif %}
+{% endblock %}
+
+
+{% block content %}
+<div id="wrap">
+{% if user|in_group:"coach" %}
+<div id='external-events'>
+{% if username %}
+<h4>My Classes</h4>
+{% else %}
+<h4>Available Classes</h4>
+{% endif %}
+{% if classes %}
+{% for avail_class in classes %}
+
+{% if username %}
+{% if avail_class.coach.username == username %}
+<div class='external-event'>{{avail_class.name}}</div>
+{% endif %}
+{% else %} 
+<div class='external-event'>{{avail_class.name}}</div>
+{% endif %}
+
+
+{% endfor %}
+{% endif %}
+<a href='/crossfit/class/description/create'>Create A New Class</a>
+</div>
+
+{% endif %}
+
+<div id='calendar' ></div>
+<div style='clear:both'></div>
+</div>
+
+{% endblock %}

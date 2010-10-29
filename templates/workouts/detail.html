@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load workout_extras %}
+{% block title %}{{workout.name}}{% endblock %}
+
+{% block content %}
+<h1>{{workout.name}}</h1>
+<p>
+<b>Description:</b> {{workout.description}}
+</p>
+{% if workout.coach_tip %}
+<p>
+<b>Coach's Tip:</b> {{workout.coach_tip}}
+</p>
+{% endif %}
+<p>
+<b>Created By:</b> {{workout.creator.username}}
+</p>
+<p>
+<b>Created On:</b> {{workout.creation_date}}
+</p>
+
+
+
+
+{% if workout.youtube_link %}
+<p>
+	{{ workout.youtube_link|youtube }}
+</p>
+{% endif %}
+
+{% if workout.tags %}
+<b>Tags</b>:
+{% for t in workout.tags.all %}
+{% if not forloop.first %},{% endif %}
+{{ t }}
+{% endfor %}
+{% endif %}
+{% endblock %}

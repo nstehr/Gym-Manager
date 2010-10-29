@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load workout_extras %}
+
+{% block js %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+      google.load("jquery", "1.4.2");
+      google.load("jqueryui", "1.8.2");
+      google.setOnLoadCallback(function(){
+			$("#roster").hide()
+			$("#recurring").hide()
+			$("#end_date").datepicker()
+			
+			$("#recurring_toggle").click(function(){
+               if ($("#recurring_toggle").is(":checked"))
+		        {
+		            $("#recurring").show();
+		        }
+		        else
+		        {      
+		            $("#recurring").hide();
+		        }
+		      });
+		});
+
+function showRoster(){
+	$("#roster").show()
+}
+
+</script>
+{% endblock %}
+
+{% block title %}{{class.class_desc.name}}{% endblock %}
+
+{% block content %}
+<h1>{{class.class_desc.name}}</h1>
+<p>
+<b>Description:</b> {{class.class_desc.description}}
+</p>
+
+<p>
+<b>Coach:</b> {{class.class_desc.coach.first_name}}
+</p>
+<p>
+<b>Start Time:</b> {{class.start}}
+</p>
+
+<p>
+<b>End Time:</b> {{class.end}}
+</p>
+<div id='actions'>
+{% if user.is_authenticated %}
+{% if class.students.count == class.class_desc.max_students and user not in class.students.all %}
+<p><b>Class Is Full. Please Contact {{class.class_desc.coach.first_name}} if you want to register.</b></p>
+{% else %}{% if user in class.students.all %}
+<a href="/crossfit/class/{{class.id}}/leave">Leave Class</a>
+{% else %}
+{% if user|in_group:"athlete" and not expired %}
+<a href="/crossfit/class/{{class.id}}/register">Register For Class</a>
+<a href="/crossfit/class/{{class.class_desc.id}}/register/all">Register For All Remaining {{class.class_desc.name}} Sessions</a>
+{% endif %}
+{% if user|in_group:"coach"%}
+<a href="/crossfit/class/{{class.id}}/delete">Delete Class</a>
+<a href="/crossfit/class/{{class.class_desc.id}}/delete/all">Delete All {{class.class_desc.name}} Classes</a>
+<a href="#" onclick="showRoster(); return false">View Class List</a>
+<a href="/crossfit/class/{{class.id}}/roster/roster.pdf">View Class List As PDF</a>
+</div>
+<div id='roster'>
+<ul>
+{% for student in class.students.all %}
+<li><a href="/crossfit/profile/details/{{student.username}}">{{student.first_name}} {{student.last_name}}</a> <a href="/crossfit/class/{{class.id}}/remove/user/{{student.id}}">X</li>
+{% endfor %}
+</ul>
+</div>
+<input type=checkbox name="recurring" id='recurring_toggle'>Make Event Recurring</input>
+<div id='recurring'>
+<form id='recur_end_date' action="/crossfit/class/{{class.id}}/recur/" method="post">{% csrf_token %}
+	Schedule Until: <input type="text" name="end_date" id="end_date"/>
+	<input type="submit" value="Submit" />
+</form>
+</div>
+
+{% endif %}
+{% endif %}{% endif %}
+{% endif %}
+{% endblock %}

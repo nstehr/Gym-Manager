@@ -1,0 +1,120 @@
+{% extends "user_base.html" %}
+{% load workout_extras %}
+
+{% block title %}{{profile.user.first_name}}'s Profile{% endblock %}
+
+{% block content %}
+
+{% if workouts.object_list %}
+{% if user != profile.user%}
+<h2>{{profile.user.first_name}}'s Workout Results</h2>
+{% else %}
+<h2>My Workout Results</h2>
+
+{% endif %}  
+
+    {% for workout in workouts.object_list %}
+        <div class="entry">
+	    	{% if workout.workout_name %}
+			<p>
+			<b>Workout:</b> {{ workout.workout_name}}
+			</p>
+			{% endif %}
+			
+			{% if workout.time %}
+			<p>
+			<b>Time:</b> {{ workout.time|time:"H:i:s"}}
+			</p>
+			{% endif %}
+			
+			{% if workout.reps %}
+			<p>
+			<b>Reps:</b> {{workout.reps}}
+			</p>
+			{% endif %}
+			
+			{% if workout.weight %}
+			<p>
+			<b>Weight:</b> {{workout.weight}}
+			</p>
+			{% endif %}
+			
+			<p>
+			{{workout.description}}
+			</p>
+			
+			<p>
+			{{workout.date}}
+			</p>
+			
+			{%if user|in_group:"athlete"%}
+			<p>
+				<a href = '/crossfit/result/{{workout.id}}/update/'>Update Entry</a>
+			</p>
+			{% endif %}
+			{%if user|in_group:"coach"%}
+			<p>
+				<a href = '/crossfit/profile/{{workout.id}}/comment/create/'>Comment on Workout</a>
+			</p>
+			{% endif %}
+			
+	</div>
+	{% if workout.comment_set %}
+	{% for comment in workout.comment_set.all %}
+	<div class ="comment">
+	<b>{{comment.coach.first_name}} Said:</b>
+	<p>
+	{{comment.comment}}
+	</p>
+	<p>
+	{{ comment.creation_date}} 
+	</p>
+	</div>
+	{% endfor %}
+	{% endif %}
+	<br>
+    {% endfor %}
+    
+
+{% endif %}
+
+{% if my_classes and user == profile.user and user|in_group:"coach" %}
+ <h2>My Classes This Week:</h2>
+ {% regroup my_classes by start|date:"l" as classes %}
+   <ul>
+   {% for class in classes %}
+       <li> <h3>{{class.grouper}}</h3>
+	    {% for item in class.list %}
+        <div class="entry">
+			<a href="/crossfit/class/{{ item.id }}/">{{ item.class_desc.name }}</a> 
+			<p>
+			<b>Starts at {{item.start|date:"P"}}</b>
+			</p>
+     </div>
+	 {% endfor %}
+    </li>
+{% endfor %}
+   </ul>
+
+{% endif %}
+
+{% if workouts.object_list %}
+<div class="pagination">
+    <span class="step-links">
+        {% if workouts.has_previous %}
+            <a href="?page={{ workouts.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ workouts.number }} of {{ workouts.paginator.num_pages }}.
+        </span>
+
+        {% if workouts.has_next %}
+            <a href="?page={{ workouts.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endif %}
+
+{% endblock %}

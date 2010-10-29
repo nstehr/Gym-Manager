@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load workout_extras %}
+
+{% block floatright %}
+<div id="floatright">
+	<ul>
+	{% if user|in_group:"coach" and user != profile.user%}
+	<li><a href="/crossfit/user/{{profile.user.username}}">View {{profile.user.first_name}}'s Workouts</a>
+	<!--<li><a href="/crossfit/profile/{{profile.id}}/comment/create/">Comment on {{profile.user.first_name}}'s Progress</a>-->
+	<li><a href="/crossfit/profile/details/{{profile.user.username}}">{{profile.user.first_name}}'s Contact Info</a></li>
+	{% endif %}
+	
+	{% if user|in_group:"coach" and user == profile.user%}
+	<li><a href="/crossfit/schedule/registered">Classes I'm Coaching</a>
+	<!--<li><a href="/crossfit/workout/create">Create New Workout</a> </li>-->
+	{% endif %}
+	
+	{% if user|in_group:"athlete" %}
+	<li><a href="/crossfit/profile/details">My Contact Info</a></li>
+	<!--<li><a href="/crossfit/profile">My Workouts</a>-->
+	<li><a href="/crossfit/schedule/registered">My Classes</a>
+<!--<li><a href="/crossfit/profile/comments">Coach's Comments</a> -->
+	<li><a href="/crossfit/result/create">Enter Workout Results</a> </li>
+	<li><a href="#">Before and After Pics</a></li>
+	{% endif %}
+	{% if user == profile.user%}
+	<li><a href="/crossfit/schedule/export/{{user.id}}/schedule.ics">Export Schedule</a></li>
+	{% endif %}
+	</ul>
+</div>
+{% endblock %}

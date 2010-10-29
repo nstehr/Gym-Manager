@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if users %}
+<h2>Athletes</h2>    
+<ul>
+    {% for user in users %}
+        <div class="main_entry">
+			<a href="/crossfit/user/{{user.username}}">{{ user.first_name }} {{ user.last_name }}'s Workouts</a>
+	</div>
+	
+    {% endfor %}
+    </ul>
+
+{% endif %}
+
+{% endblock %}

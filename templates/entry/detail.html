@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load workout_extras %}
+
+{% block title %}Result For: {{ entry.time|time:"H:i:s"}} {% endblock %}
+
+{% block content %}
+	
+	{% if entry.workout_name %}
+	<p>
+	<b>Workout:</b> {{ entry.workout_name.name}}
+	</p>
+	{% endif %}
+	{% if entry.time %}
+	<p>
+	<b>Time:</b> {{ entry.time|time:"H:i:s"}}
+	</p>
+	{% endif %}
+	
+	{% if entry.reps %}
+	<p>
+	<b>Reps:</b> {{entry.reps}}
+	</p>
+	{% endif %}
+	
+	{% if entry.weight %}
+	<p>
+	<b>Weight:</b> {{entry.weight}}
+	</p>
+	{% endif %}
+	
+	<p>
+	{{entry.description}}
+	</p>
+	{%if user|in_group:"athlete"%}
+	<p>
+		<a href = '/crossfit/result/{{workout.id}}/update/'>Update Entry</a>
+	</p>
+	{% endif %}
+{% endblock %}
